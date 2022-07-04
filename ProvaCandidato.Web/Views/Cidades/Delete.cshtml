@@ -1,0 +1,74 @@
+﻿@model ProvaCandidato.Data.Entidade.Cidade
+
+@{
+    ViewBag.Title = "Deletar Cidade";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<h3>Você quer mesmo deletar esta cidade?</h3>
+<div>
+    <h4>Cidade</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Nome)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Nome)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Deletar" class="btn btn-default" /> | 
+            <input type="button" value="Deletar via AJAX" onclick="deletarRegistro();" class="btn btn-default" /> |
+            @Html.ActionLink("Voltar", "Index")
+        </div>
+    }
+
+    @section Scripts{
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script type="text/javascript">
+        function deletarRegistro() {
+                    swal({
+                        title: 'Excluir Registro',
+                        text: `Deseja realmente Excluir o Registro?`,
+                        icon: 'warning',
+                        buttons: {
+                            cancel: "Cancelar",
+                            continue: {
+                                text: "Continuar",
+                                value: "deleteClick"
+                            }
+                        }
+                    }).then((value) => {
+                        if (value === "deleteClick") {
+                            $.ajax({
+                                url: `@Url.Action($"Delete","Cidades", new { id = Model.Codigo})`,
+                                dataType: "json",
+                                contentType: 'application/json',
+                                method: 'POST',
+                                success: (res) => {
+                                    console.log("RES");
+                                    console.log(res);
+                                    swal("Registro excluído com sucesso!", `${res.message}`, "success");
+                                },
+                                error: (err) => {
+                                    console.log("ERR");
+                                    console.log(err);
+                                    if (err.status === 200) return swal("Registro excluído com sucesso!", `Registro excluído com sucesso`, "success");
+
+                                    swal("Ocorreu um erro", `${err.message}`, "error");
+                                }
+                            });
+                        }
+                     });
+                }
+        </script>
+    }
